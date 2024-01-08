@@ -1,0 +1,35 @@
+name: Automated Git Pull on GCP Instance
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  access-gcp-instance:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v0.2.0
+      with:
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        project_id: programmers-410523 # YOUR_GCP_PROJECT_ID
+        export_default_credentials: true
+  
+    - name: Access Compute Engine and Execute Command
+      run: |
+        # SSH 접속 명령어
+        gcloud compute ssh kylj0107@project-machine --zone=us-west4-b --command="\
+          sudo su - airflow -c '\
+            cd ~/dev-course-project-03 && \
+            git config credential.helper '!f() { echo username=x-oauth-basic; echo password=$MY_GITHUB_TOKEN; }; f' && \
+            git pull\
+          '"
+      env:
+        MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
