@@ -37,6 +37,7 @@ dev-course-project-03 리포지토리를 다운로드 받고 메인폴더로 이
 airflow를 실행하기 전에 현재 사용자의 UID를 .env파일에 설정함  
 이 작업은 Docker 컨테이너와 호스트 시스템 간의 파일 권한 문제를 해결하기 위해 필요(권장)
 ```shell
+mkdir -p ./dags ./logs ./plugins ./config
 echo -e "AIRFLOW_UID=$(id -u)" > .env
 
 ```
