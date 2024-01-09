@@ -3,7 +3,7 @@ name: Automated Git Pull on GCP Instance
 on:
   push:
     branches:
-      - main
+      - feature/workflows
   pull_request:
     branches:
       - main
