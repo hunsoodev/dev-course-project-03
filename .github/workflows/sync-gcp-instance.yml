@@ -30,7 +30,7 @@ jobs:
         gcloud compute ssh kylj0107@project-machine --zone=us-west4-b --command="\
           sudo su - airflow -c '\
             cd ~/dev-course-project-03 && \
-            git config credential.helper 'cache --timeout=5' && \
+            git config credential.helper \"cache --timeout=5\" && \
             echo username=$USER_NAME && echo password=$MY_GITHUB_TOKEN | git credential approve && \
             git pull\
           '"
