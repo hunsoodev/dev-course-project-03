@@ -3,7 +3,7 @@ name: Automated Git Pull and Conditional Docker Compose Restart on GCP Instance
 on:
   push:
     branches:
-      - main
+      - develop
       
 env:
   USER_NAME: ${{ vars.USERNAME }}
@@ -31,7 +31,7 @@ jobs:
             git config credential.helper \"cache --timeout=5\" && \
             echo username=$USER_NAME && echo password=$MY_GITHUB_TOKEN | git credential approve && \
             git fetch --all && \
-            git diff HEAD..origin/main --name-only | grep 'docker-compose.yml' && \
+            git diff HEAD..origin/develop --name-only | grep 'docker-compose.yml' && \
             IS_DOCKER_COMPOSE_CHANGED=$? && \
             git pull && \
             if [ $IS_DOCKER_COMPOSE_CHANGED -eq 0 ]; then \
