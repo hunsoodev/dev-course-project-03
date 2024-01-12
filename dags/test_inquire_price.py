@@ -60,7 +60,6 @@ dag = DAG(
 # API에서 데이터를 읽어와서 csv 파일로 저장하는 함수.
 def fetch_data_and_load_as_csv(**kwargs):
     execution_date = kwargs['execution_date']
-    execution_date = execution_date.strftime('%Y-%m-%d-%H')
     csv_file_path = f'inquire_price_data_{execution_date}.csv'
     s3_key = f'jaeho/{csv_file_path}'
     
