@@ -37,9 +37,7 @@ jobs:
             if [ $IS_DOCKER_COMPOSE_CHANGED -eq 0 ]; then \
               docker-compose down && \
               docker-compose up -d && \
-            else \
-              echo 'No changes in docker-compose.yml. Skipping Docker Compose restart.' \
-            fi && \
+            fi\
           '"
       env:
         MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
