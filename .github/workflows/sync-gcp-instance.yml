@@ -31,8 +31,8 @@ jobs:
             git config credential.helper \"cache --timeout=5\" && \
             echo username=$USER_NAME && echo password=$MY_GITHUB_TOKEN | git credential approve && \
             git diff HEAD..origin/feature/workflows --name-only | grep 'docker-compose.yaml' && \
-            IS_DOCKER_COMPOSE_CHANGED=$? && IS_DOCKER_COMPOSE_CHANGED=$(($IS_DOCKER_COMPOSE_CHANGED)) && \
-            if [ $IS_DOCKER_COMPOSE_CHANGED -eq 0 ]; then \
+            IS_DOCKER_COMPOSE_CHANGED=$? && \
+            if [ $IS_DOCKER_COMPOSE_CHANGED == 0 ]; then \
               docker-compose down && \
               docker-compose up -d; \
             fi && \
