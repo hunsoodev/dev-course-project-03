@@ -26,17 +26,17 @@ jobs:
       run: |
         # SSH 접속 및 명령 실행
         gcloud compute ssh kylj0107@project-machine --zone=us-west4-b
-        sudo su airflow
-        cd ~/dev-course-project-03
-        git config credential.helper "cache --timeout=5"
-        echo username=$USER_NAME && echo password=$MY_GITHUB_TOKEN | git credential approve
+        sudo su - airflow && \
+        cd ~/dev-course-project-03 && \
+        git config credential.helper "cache --timeout=5" && \
+        echo username=$USER_NAME && echo password=$MY_GITHUB_TOKEN | git credential approve && \
         git diff HEAD..origin/feature/workflows --name-only | grep 'docker-compose.yaml' && \
-        IS_DOCKER_COMPOSE_CHANGED=$?
+        IS_DOCKER_COMPOSE_CHANGED=$? && \
         if [ $IS_DOCKER_COMPOSE_CHANGED -eq 0 ]; then
           docker-compose down && \
           docker-compose up -d
-        fi
-          git pull
+        fi && \
+        git pull
       env:
         MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
             
