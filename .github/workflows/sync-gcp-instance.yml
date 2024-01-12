@@ -26,6 +26,7 @@ jobs:
       run: |
         gcloud compute ssh kylj0107@project-machine --zone=us-west4-b --command="\
           sudo su - airflow -c '\
+            git pull
             git diff --name-only HEAD@{1} HEAD | grep 'docker-compose.yml' && \
             IS_DOCKER_COMPOSE_CHANGED=$? && \
             if [ $IS_DOCKER_COMPOSE_CHANGED -eq 0 ]; then \
