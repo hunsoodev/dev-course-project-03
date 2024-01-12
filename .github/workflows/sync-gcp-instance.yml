@@ -31,9 +31,9 @@ jobs:
             echo username=$USER_NAME && echo password=$MY_GITHUB_TOKEN | git credential approve && \
             git fetch --all && \
             git checkout develop && \
-            git pull origin develop && \
             git diff HEAD..origin/develop --name-only | grep 'docker-compose.yaml' && \
             IS_DOCKER_COMPOSE_CHANGED=$? && \
+            git pull origin develop && \
             if [ $IS_DOCKER_COMPOSE_CHANGED -eq 0 ]; then \
               docker-compose down && \
               docker-compose up -d; \
