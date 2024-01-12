@@ -57,7 +57,7 @@ dag = DAG(
     catchup=True,
 )
 
-# API에서 데이터를 읽어와서 csv 파일로 저장하는 함수.
+# API에서 데이터를 읽어와서 s3로 저장하는 함수.
 def fetch_data_and_upload_to_s3(**kwargs):
     execution_date = kwargs['execution_date'].strftime('%Y-%m-%d-%H-%M-%S')
     csv_file_path = f'inquire_time_itemconclusion_data_{execution_date}.csv'
@@ -159,7 +159,7 @@ def s3_to_snowflake(**kwargs):
         logging.error(e)
         raise
     
-# API에서 데이터를 읽어와서 csv 파일로 저장하는 Task
+# API에서 데이터를 읽어와서 s3로 저장하는 Task
 fetch_data_task = PythonOperator(
     task_id='fetch_data_and_upload_to_s3',
     python_callable=fetch_data_and_upload_to_s3,
