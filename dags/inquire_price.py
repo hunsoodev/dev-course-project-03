@@ -50,7 +50,7 @@ default_args = {
 }
 
 dag = DAG(
-    dag_id='inquire_price',
+    dag_id='test_inquire_price',
     default_args=default_args,
     description='주식현재가 시세 관련 dag',
     schedule='0 9-15 * * 1-5',
@@ -99,6 +99,7 @@ def fetch_data_and_load_as_csv(**kwargs):
                 if len(stock_info) <= 79:
                     stock_info.append(fid_input_iscd_list[i])
                     stock_info.append(execution_date)
+                    print(i, len(stock_info))
                     row_list.append(stock_info)
             else:
                 logging.error("ERROR : API response error")
