@@ -99,7 +99,7 @@ bulk_update_snowflake = S3ToSnowflakeOperator(
     s3_keys=["{{ task_instance.xcom_pull(task_ids='get_volume_rank_data') }}"],
     stage='volume_rank',
     table='volume_rank',
-    file_format='CSV_SKIP_HEADER',
+    file_format='SKIP_HEADER_AND_ADD_CREATED_AT',
     snowflake_conn_id='snowflake_conn_id',
     dag=dag
 )

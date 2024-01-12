@@ -90,7 +90,7 @@ bulk_update_snowflake = S3ToSnowflakeOperator(
     s3_keys=["{{ task_instance.xcom_pull(task_ids='get_inquire_investor_data') }}"],
     stage='inquire_investor',
     table='inquire_investor',
-    file_format='CSV_SKIP_HEADER',
+    file_format='SKIP_HEADER_AND_ADD_CREATED_AT',
     snowflake_conn_id='snowflake_conn_id',
     dag=dag
 )
