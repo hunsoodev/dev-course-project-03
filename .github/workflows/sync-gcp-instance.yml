@@ -25,8 +25,8 @@ jobs:
     - name: Access Compute Engine and Execute Command
       run: |
         # SSH 접속 및 명령 실행
-        gcloud compute ssh kylj0107@project-machine --zone=us-west4-b
-        sudo su - airflow && \
+        gcloud compute ssh kylj0107@project-machine --zone=us-west4-b && \
+        sudo su airflow && \
         cd ~/dev-course-project-03 && \
         git config credential.helper "cache --timeout=5" && \
         echo username=$USER_NAME && echo password=$MY_GITHUB_TOKEN | git credential approve && \
