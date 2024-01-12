@@ -24,11 +24,11 @@ jobs:
 
     - name: Access Compute Engine and Execute Command
       run: |
-        gcloud compute ssh kylj0107@project-machine --zone=us-west4-b --command="\
+       gcloud compute ssh kylj0107@project-machine --zone=us-west4-b --command="\
           sudo su - airflow -c '\
             cd ~/dev-course-project-03 && \
             git config credential.helper \"cache --timeout=5\" && \
-            git credential approve && \
+            echo username=$USER_NAME && echo password=$MY_GITHUB_TOKEN | git credential approve && \
             git fetch --all && \
             git checkout develop && \
             git pull origin develop && \
@@ -36,8 +36,8 @@ jobs:
             IS_DOCKER_COMPOSE_CHANGED=$? && \
             if [ $IS_DOCKER_COMPOSE_CHANGED -eq 0 ]; then \
               docker-compose down && \
-              docker-compose up -d && \
-            fi' ;\
-          "
+              docker-compose up -d \
+            fi\
+          '"
       env:
         MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
