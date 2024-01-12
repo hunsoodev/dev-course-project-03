@@ -26,18 +26,18 @@ jobs:
       run: |
         gcloud compute ssh kylj0107@project-machine --zone=us-west4-b --command="\
           sudo su - airflow -c '\
-            cd ~/dev-course-project-03 && \
-            git config credential.helper \"cache --timeout=5\" && \
-            echo username=$USER_NAME && echo password=$MY_GITHUB_TOKEN | git credential approve && \
-            git pull origin develop && \
-            git checkout develop && \
-            git diff HEAD..origin/develop --name-only | grep 'docker-compose.yaml' && \
+            git diff --name-only HEAD@{1} HEAD | grep 'docker-compose.yml' && \
             IS_DOCKER_COMPOSE_CHANGED=$? && \
             if [ $IS_DOCKER_COMPOSE_CHANGED -eq 0 ]; then \
+              echo \"docker-compose.yml changed, restarting Docker Compose\" && \
               docker-compose down && \
-              docker-compose up -d; \
+              docker-compose up -d && \
+              echo \"Docker Compose restarted\" \
+            else \
+              echo \"No changes in docker-compose.yml\" \
             fi\
           '"
+        echo "Docker Compose check and restart process completed"
       env:
         MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
             
