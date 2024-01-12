@@ -26,29 +26,20 @@ jobs:
       run: |
         gcloud compute ssh kylj0107@project-machine --zone=us-west4-b --command="\
           sudo su - airflow -c '\
-            echo 'Starting script...' && \
             cd ~/dev-course-project-03 && \
-            echo 'Configuring Git credentials...' && \
             git config credential.helper \"cache --timeout=5\" && \
-            echo username=$USER_NAME && echo password=$MY_GITHUB_TOKEN | git credential approve && \
-            echo 'Fetching all branches...' && \
+            git credential approve && \
             git fetch --all && \
-            echo 'Checking out develop branch...' && \
             git checkout develop && \
-            echo 'Pulling latest changes from origin/develop...' && \
             git pull origin develop && \
-            echo 'Checking for changes in docker-compose.yml...' && \
             git diff --name-only HEAD@{1} HEAD | grep 'docker-compose.yaml' && \
             IS_DOCKER_COMPOSE_CHANGED=$? && \
             if [ $IS_DOCKER_COMPOSE_CHANGED -eq 0 ]; then \
-              echo 'docker-compose.yml changed. Restarting Docker Compose...' && \
-              docker-compose down || echo 'Failed to run docker-compose down' && \
-              docker-compose up -d || echo 'Failed to run docker-compose up' && \
-              echo 'Docker Compose restarted successfully.' \
+              docker-compose down && \
+              docker-compose up -d && \
             else \
               echo 'No changes in docker-compose.yml. Skipping Docker Compose restart.' \
             fi && \
-            echo 'Script completed.'\
           '"
       env:
         MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
