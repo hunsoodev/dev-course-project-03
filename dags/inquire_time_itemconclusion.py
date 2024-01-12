@@ -3,10 +3,10 @@ from airflow import DAG
 from airflow.models import Variable
 from airflow.operators.python_operator import PythonOperator
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
+from io import StringIO
 import requests
 import pandas as pd
 import logging
-import os
 import FinanceDataReader as fdr
 import time
 import boto3
@@ -58,8 +58,8 @@ dag = DAG(
 )
 
 # API에서 데이터를 읽어와서 csv 파일로 저장하는 함수.
-def fetch_data_and_load_as_csv(**kwargs):
-    execution_date = kwargs['execution_date']
+def fetch_data_and_upload_to_s3(**kwargs):
+    execution_date = kwargs['execution_date'].strftime('%Y-%m-%d-%H-%M-%S')
     csv_file_path = f'inquire_time_itemconclusion_data_{execution_date}.csv'
     s3_key = f'jaeho/{csv_file_path}'
     
@@ -84,7 +84,7 @@ def fetch_data_and_load_as_csv(**kwargs):
         print('s3_key:', s3_key)
         row_list = []
         
-        for i in range(len(fid_input_iscd_list)):
+        for i in range(100):
             time.sleep(0.05)
             params = {
             'FID_COND_MRKT_DIV_CODE': 'J',
@@ -109,38 +109,17 @@ def fetch_data_and_load_as_csv(**kwargs):
         df.replace({' ': 'null'}, inplace=True)
         df.replace({'': 'null'}, inplace=True)
         df = df.applymap(lambda x: str(x).replace(',', ''))
-        df.to_csv(csv_file_path, index=False)
-        print(f'파일 {csv_file_path}를 로컬 디렉토리에 저장하였습니다')
-        
-    except Exception as e:
-        logging.error(e)
-        raise
-
-# csv -> S3 로드하는 함수
-def upload_to_s3(**kwargs):
-    try:
-        ti = kwargs['ti']
-        csv_file_path = ti.xcom_pull(task_ids='fetch_data_and_load_as_csv', key='csv_file_path')
-        s3_key = ti.xcom_pull(task_ids='fetch_data_and_load_as_csv', key='s3_key')
+        csv_buffer = StringIO()
+        df.to_csv(csv_buffer, index=False)
+        csv_data = csv_buffer.getvalue()
         s3_hook = S3Hook(aws_conn_id='aws_s3_conn_id')
-        s3_hook.load_file(
-            filename=csv_file_path,
+        s3_hook.load_string(
+            string_data=csv_data,
             key=s3_key,
             bucket_name=s3_bucket,
             replace=True
         )
-        print(f'파일 {csv_file_path}를 {s3_bucket}/{s3_key}(으)로 업로드하였습니다.')
-    except Exception as e:
-        logging.error(e)
-        raise
-
-# local directory에서 csv 파일 삭제하는 함수
-def remove_csv(**kwargs):
-    try:
-        ti = kwargs['ti']
-        csv_file_path = ti.xcom_pull(task_ids='fetch_data_and_load_as_csv', key='csv_file_path')
-        os.remove(csv_file_path)
-        print(f'파일 {csv_file_path}를 local directory에서 삭제하였습니다.')
+        
     except Exception as e:
         logging.error(e)
         raise
@@ -149,7 +128,7 @@ def remove_csv(**kwargs):
 def s3_to_snowflake(**kwargs):
     try:
         ti = kwargs['ti']
-        s3_key = ti.xcom_pull(task_ids='fetch_data_and_load_as_csv', key='s3_key')
+        s3_key = ti.xcom_pull(task_ids='fetch_data_and_upload_to_s3', key='s3_key')
         conn = snowflake.connector.connect(
             user=snowflake_user,
             password=snowflake_password,
@@ -182,24 +161,8 @@ def s3_to_snowflake(**kwargs):
     
 # API에서 데이터를 읽어와서 csv 파일로 저장하는 Task
 fetch_data_task = PythonOperator(
-    task_id='fetch_data_and_load_as_csv',
-    python_callable=fetch_data_and_load_as_csv,
-    provide_context=True,
-    dag=dag,
-)
-
-# csv 파일을 S3에 업로드하는 Task
-upload_to_s3_task = PythonOperator(
-    task_id='upload_to_s3',
-    python_callable=upload_to_s3,
-    provide_context=True,
-    dag=dag,
-)
-
-# 로컬에 저장된 csv 파일을 삭제하는 Task
-remove_csv_task = PythonOperator(
-    task_id='remove_csv',
-    python_callable=remove_csv,
+    task_id='fetch_data_and_upload_to_s3',
+    python_callable=fetch_data_and_upload_to_s3,
     provide_context=True,
     dag=dag,
 )
@@ -213,4 +176,4 @@ s3_to_snowflake_task = PythonOperator(
 )
 
 # Task 간의 의존성 설정
-fetch_data_task >> upload_to_s3_task >> remove_csv_task >> s3_to_snowflake_task
+fetch_data_task >> s3_to_snowflake_task
