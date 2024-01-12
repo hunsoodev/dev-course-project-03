@@ -30,6 +30,7 @@ jobs:
             cd ~/dev-course-project-03 && \
             git config credential.helper \"cache --timeout=5\" && \
             echo username=$USER_NAME && echo password=$MY_GITHUB_TOKEN | git credential approve && \
+            git checkout develop && \
             git fetch --all && \
             git diff HEAD..origin/develop --name-only | grep 'docker-compose.yml' && \
             IS_DOCKER_COMPOSE_CHANGED=$? && \
