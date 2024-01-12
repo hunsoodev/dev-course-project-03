@@ -28,10 +28,9 @@ jobs:
           sudo su - airflow -c '\
             cd ~/dev-course-project-03 && \
             git config credential.helper \"cache --timeout=5\" && \
-            git fetch --all && \
-            git checkout develop && \
-            git pull origin develop && \
-            git diff --name-only HEAD@{1} HEAD | grep 'docker-compose.yml' && \
+            git fetch && \
+            git diff HEAD..origin/develop --name-only | grep 'docker-compose.yml' && \
+            git pull && \
             IS_DOCKER_COMPOSE_CHANGED=$? && \
             if [ $IS_DOCKER_COMPOSE_CHANGED -eq 0 ]; then \
               docker-compose down && \
