@@ -38,12 +38,12 @@ jobs:
             echo 'Pulling latest changes from origin/develop...' && \
             git pull origin develop && \
             echo 'Checking for changes in docker-compose.yml...' && \
-            git diff --name-only HEAD@{1} HEAD | grep 'docker-compose.yml' && \
+            git diff --name-only HEAD@{1} HEAD | grep 'docker-compose.yaml' && \
             IS_DOCKER_COMPOSE_CHANGED=$? && \
             if [ $IS_DOCKER_COMPOSE_CHANGED -eq 0 ]; then \
               echo 'docker-compose.yml changed. Restarting Docker Compose...' && \
               docker-compose down || echo 'Failed to run docker-compose down' && \
-              docker-compose up -d || echo 'Failed to run docker-compose up' && \
+              docker-compose up -d || echo 'Failed to run docker-compose up -d' && \
               echo 'Docker Compose restarted successfully.' \
             else \
               echo 'No changes in docker-compose.yml. Skipping Docker Compose restart.' \
