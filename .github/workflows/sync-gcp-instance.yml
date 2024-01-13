@@ -21,14 +21,4 @@ jobs:
     - name: Access Compute Engine and Execute Command
       env:
         MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
-      run: |
-        # SSH 접속 및 명령 실행
-        gcloud compute ssh kylj0107@project-machine --zone=us-west4-b --command="\
-          sudo su - airflow -c '\
-            cd ~/dev-course-project-03 && \
-            git pull && \
-            if git diff --name-only HEAD@{1} HEAD | grep -q 'docker-compose.yaml'; then \
-              docker-compose down && \
-              docker-compose up -d; \
-            fi \
-          '"
+      run: gcloud compute ssh kylj0107@project-machine --zone=us-west4-b --command="sudo su - airflow -c 'bash ~/script.sh'"
