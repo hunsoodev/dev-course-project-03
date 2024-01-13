@@ -22,7 +22,6 @@ jobs:
     - name: Access Compute Engine and Execute Command
       env:
         MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
-        USER_NAME: ${{ vars.USERNAME }}
       run: |
         # SSH 접속 및 명령 실행
         gcloud compute ssh kylj0107@project-machine --zone=us-west4-b --command="\
