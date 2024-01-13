@@ -1,55 +1,25 @@
 name: Automated Git Pull and Conditional Docker Compose Restart on GCP Instance
-
 on:
   push:
     branches:
-      - develop
+      - feature/workflows
       
-env:
-  USER_NAME: ${{ vars.USERNAME }}
 
 jobs:
   access-gcp-instance:
     runs-on: ubuntu-latest
+    
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-
+      
     - name: Set up Google Cloud SDK
       uses: google-github-actions/setup-gcloud@v0.2.0
       with:
         service_account_key: ${{ secrets.GCP_SA_KEY }}
         project_id: programmers-410523
-        export_default_credentials: true
 
     - name: Access Compute Engine and Execute Command
-      run: |
-        gcloud compute ssh kylj0107@project-machine --zone=us-west4-b --command="\
-          sudo su - airflow -c '\
-            echo 'Starting script...' && \
-            cd ~/dev-course-project-03 && \
-            echo 'Configuring Git credentials...' && \
-            git config credential.helper \"cache --timeout=5\" && \
-            echo username=$USER_NAME && echo password=$MY_GITHUB_TOKEN | git credential approve && \
-            echo 'Fetching all branches...' && \
-            git fetch --all && \
-            echo 'Checking out develop branch...' && \
-            git checkout develop && \
-            echo 'Pulling latest changes from origin/develop...' && \
-            git pull origin develop && \
-            echo 'Checking for changes in docker-compose.yml...' && \
-            git diff --name-only HEAD@{1} HEAD | grep 'docker-compose.yaml' && \
-            IS_DOCKER_COMPOSE_CHANGED=$? && \
-            if [ $IS_DOCKER_COMPOSE_CHANGED -eq 0 ]; then \
-              echo 'docker-compose.yml changed. Restarting Docker Compose...' && \
-              docker-compose down || echo 'Failed to run docker-compose down' && \
-              docker-compose up -d || echo 'Failed to run docker-compose up' && \
-              echo 'Docker Compose restarted successfully.' \
-            else \
-              echo 'No changes in docker-compose.yml. Skipping Docker Compose restart.' \
-            fi && \
-            echo 'Script completed.'\
-          '"
       env:
         MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
-        
+      run: gcloud compute ssh kylj0107@project-machine --zone=us-west4-b --command="sudo su - airflow -c 'bash ~/script.sh'"
