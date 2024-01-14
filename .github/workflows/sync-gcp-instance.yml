@@ -2,7 +2,7 @@ name: Automated Git Pull and Conditional Docker Compose Restart on GCP Instance
 on:
   push:
     branches:
-      - develop
+      - main
       
 
 jobs:
