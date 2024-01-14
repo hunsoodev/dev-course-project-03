@@ -3,7 +3,7 @@
 echo "Moving to the project directory..."
 cd ~/dev-course-project-03 || { echo "Failed to change directory. Exiting."; exit 1; }
 
-echo "Switching to 'develop' branch..."
+echo "Switching to 'main' branch..."
 git switch main || { echo "Failed to switch branch. Exiting."; exit 1; }
 
 echo "Fetching the latest changes from origin..."
