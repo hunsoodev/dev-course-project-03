@@ -9,7 +9,6 @@ import requests
 import logging
 import os
 
-# 접속 및 정보등록
 import boto3
 import csv
 import snowflake.connector
@@ -17,7 +16,7 @@ import snowflake.connector
 @task
 def import_csv():
     dag_folder = os.path.dirname(os.path.realpath(__file__))
-    file_path = os.path.join(dag_folder, 'stockcode.csv')  # CSV 파일 상대 경로
+    file_path = os.path.join(dag_folder, 'stockcode.csv') 
     stockcode = []
     with open(file_path, 'r') as csvfile:
         csvreader = csv.reader(csvfile)
@@ -55,7 +54,7 @@ def extract_and_transform(KIS_BASE_URL, VOLUME_RANK_URL, headers, stockcode):
                 list_data.append(result)
                 start = True
             values = list(temp.values())
-            row = [code]
+            row = [str(code)]
             result = row + values
             list_data.append(result)
         else:
@@ -72,7 +71,6 @@ def load_to_S3(aws_access_key_id, aws_secret_access_key,list_data):
         for row in list_data:
             writer.writerow(row)
 
-    # S3 클라이언트 생성
     s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id,
                       aws_secret_access_key=aws_secret_access_key)
     bucket_name = 'programmers-bucket'
@@ -85,7 +83,6 @@ def load_to_S3(aws_access_key_id, aws_secret_access_key,list_data):
 
 @task
 def s3_to_snowflake(aws_access_key_id,aws_secret_access_key):
-    # Snowflake 관련 정보
     snowflake_account = Variable.get('snowflake_account')
     snowflake_user = Variable.get('snowflake_user')
     snowflake_password = Variable.get('snowflake_password')
@@ -114,7 +111,7 @@ def s3_to_snowflake(aws_access_key_id,aws_secret_access_key):
         
         sql_create_tables = f"""
             create or replace TABLE MINHOE.RAW_DATA.PROGRAM_TRADE_BY_STOCK (
-                STOCKCODE NUMBER(38,0),
+                STOCKCODE VARCHAR(16777216),
                 BSOP_HOUR NUMBER(38,0),
                 STCK_PRPR NUMBER(38,0),
                 PRDY_VRSS NUMBER(38,0),
@@ -152,14 +149,12 @@ def s3_to_snowflake(aws_access_key_id,aws_secret_access_key):
     
 with DAG(
     dag_id='program_trade_by_stock',
-    start_date=datetime(2022, 10, 6),  # 날짜가 미래인 경우 실행이 안됨
-    schedule='0 2 * * *',  # 적당히 조절
-    max_active_runs=1,
+    start_date=datetime(2023, 12, 1), 
+    schedule='0 2 * * *',  
     catchup=False,
     default_args={
         'retries': 1,
         'retry_delay': timedelta(minutes=1),
-        # 'on_failure_callback': slack.on_failure_callback,
     }
 ) as dag:
 

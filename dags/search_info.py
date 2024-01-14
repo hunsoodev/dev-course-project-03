@@ -9,7 +9,6 @@ import requests
 import logging
 import os
 
-# 접속 및 정보등록
 import boto3
 import csv
 import snowflake.connector
@@ -17,7 +16,7 @@ import snowflake.connector
 @task
 def import_csv():
     dag_folder = os.path.dirname(os.path.realpath(__file__))
-    file_path = os.path.join(dag_folder, 'stockcode.csv')  # CSV 파일 상대 경로
+    file_path = os.path.join(dag_folder, 'stockcode.csv')
     stockcode = []
     with open(file_path, 'r') as csvfile:
         csvreader = csv.reader(csvfile)
@@ -81,7 +80,6 @@ def load_to_S3(aws_access_key_id, aws_secret_access_key,list_data):
 
 @task
 def s3_to_snowflake(aws_access_key_id,aws_secret_access_key):
-    # Snowflake 관련 정보
     snowflake_account = Variable.get('snowflake_account')
     snowflake_user = Variable.get('snowflake_user')
     snowflake_password = Variable.get('snowflake_password')
@@ -109,27 +107,27 @@ def s3_to_snowflake(aws_access_key_id,aws_secret_access_key):
             """
 
         sql_create_tables = f"""
-            CREATE OR REPLACE TABLE MINHOE.RAW_DATA.SEARCH_INFO (
-                pdno VARCHAR(16777216),
-                prdt_type_cd VARCHAR(16777216),
-                prdt_name VARCHAR(16777216),
-                prdt_name120 VARCHAR(16777216),
-                prdt_abrv_name VARCHAR(16777216),
-                prdt_eng_name VARCHAR(16777216),
-                prdt_eng_name120 VARCHAR(16777216),
-                prdt_eng_abrv_name VARCHAR(16777216),
-                std_pdno VARCHAR(16777216),
-                shtn_pdno VARCHAR(16777216),
-                prdt_sale_stat_cd VARCHAR(16777216),
-                prdt_risk_grad_cd VARCHAR(16777216),
-                prdt_cls_cd VARCHAR(16777216),
-                prdt_cls_name VARCHAR(16777216),
-                sale_strt_dt VARCHAR(16777216),
-                sale_end_dt VARCHAR(16777216),
-                wrap_asst_type_cd VARCHAR(16777216),
-                ivst_prdt_type_cd VARCHAR(16777216),
-                ivst_prdt_type_cd_name VARCHAR(16777216),
-                frst_erlm_dt VARCHAR(16777216)
+            create or replace TABLE MINHOE.RAW_DATA.SEARCH_INFO (
+                PDNO VARCHAR(16777216),
+                PRDT_TYPE_CD NUMBER(38,0),
+                PRDT_NAME VARCHAR(16777216),
+                PRDT_NAME120 VARCHAR(16777216),
+                PRDT_ABRV_NAME VARCHAR(16777216),
+                PRDT_ENG_NAME VARCHAR(16777216),
+                PRDT_ENG_NAME120 VARCHAR(16777216),
+                PRDT_ENG_ABRV_NAME VARCHAR(16777216),
+                STD_PDNO VARCHAR(16777216),
+                SHTN_PDNO NUMBER(38,0),
+                PRDT_SALE_STAT_CD VARCHAR(16777216),
+                PRDT_RISK_GRAD_CD VARCHAR(16777216),
+                PRDT_CLSF_CD NUMBER(38,0),
+                PRDT_CLSF_NAME VARCHAR(16777216),
+                SALE_STRT_DT VARCHAR(16777216),
+                SALE_END_DT VARCHAR(16777216),
+                WRAP_ASST_TYPE_CD NUMBER(38,0),
+                IVST_PRDT_TYPE_CD NUMBER(38,0),
+                IVST_PRDT_TYPE_CD_NAME VARCHAR(16777216),
+                FRST_ERLM_DT VARCHAR(16777216)
             );
         """
         sql_copy = f"""
@@ -153,14 +151,13 @@ def s3_to_snowflake(aws_access_key_id,aws_secret_access_key):
     
 with DAG(
     dag_id='search_info',
-    start_date=datetime(2022, 10, 6),  # 날짜가 미래인 경우 실행이 안됨
-    schedule='0 2 * * *',  # 적당히 조절
+    start_date=datetime(2023, 12, 1),  
+    schedule='0 2 * * *', 
     max_active_runs=1,
     catchup=False,
     default_args={
         'retries': 1,
         'retry_delay': timedelta(minutes=0),
-        # 'on_failure_callback': slack.on_failure_callback,
     }
 ) as dag:
 
