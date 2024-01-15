@@ -23,7 +23,7 @@ jobs:
       run: |
         git fetch origin main
         git checkout origin/main -- script.sh
-        gcloud compute scp ./script.sh kylj0107@project-machine:~/dev-course-project-03 --zone=us-west4-b
+        gcloud compute scp ./script.sh airflow@project-machine:~/dev-course-project-03/script.sh --zone=us-west4-b
 
     - name: Access Compute Engine and Execute Command
       env:
