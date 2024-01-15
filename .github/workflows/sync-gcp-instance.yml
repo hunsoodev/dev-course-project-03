@@ -26,7 +26,8 @@ jobs:
         format: 'space-delimited'
         token: ${{ secrets.MY_GITHUB_TOKEN }}
 
-    - name: Copy script.sh to GCP Instance
+    - name: Copy script.sh to GCP Instancek
+      if: contains(steps.check-file.outputs.all, 'script.sh')
       run: |
         git fetch origin main
         git checkout origin/main -- script.sh
