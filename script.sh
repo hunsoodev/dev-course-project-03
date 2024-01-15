@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "test"
+
 echo "Moving to the project directory..."
 cd ~/dev-course-project-03 || { echo "Failed to change directory. Exiting."; exit 1; }
 
