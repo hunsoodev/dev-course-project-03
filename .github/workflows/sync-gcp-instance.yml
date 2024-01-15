@@ -19,13 +19,20 @@ jobs:
         service_account_key: ${{ secrets.GCP_SA_KEY }}
         project_id: programmers-410523
 
+    - name: Check for script.sh changes
+      id: check-file
+      uses: jitterbit/get-changed-files@v1
+      with:
+        format: 'space-delimited'
+        token: ${{ secrets.MY_GITHUB_TOKEN }}
+
     - name: Copy script.sh to GCP Instance
       run: |
         git fetch origin main
         git checkout origin/main -- script.sh
-        gcloud compute scp ./script.sh airflow@project-machine:~/dev-course-project-03/script.sh --zone=us-west4-b
+        gcloud compute scp ./script.sh airflow@project-machine:~/script.sh --zone=us-west4-b
 
     - name: Access Compute Engine and Execute Command
       env:
         MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
-      run: gcloud compute ssh kylj0107@project-machine --zone=us-west4-b --command="sudo su - airflow -c 'bash ~/dev-course-project-03/script.sh'"
+      run: gcloud compute ssh airflow@project-machine --zone=us-west4-b --command="bash ~/script.sh"
