@@ -34,6 +34,4 @@ jobs:
         gcloud compute scp ./script.sh airflow@project-machine:~/script.sh --zone=us-west4-b
 
     - name: Access Compute Engine and Execute Command
-      env:
-        MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
       run: gcloud compute ssh airflow@project-machine --zone=us-west4-b --command="bash ~/script.sh"
