@@ -45,3 +45,4 @@ if [ "$flag" = true ]; then
 
   # stash에 저장된 변경사항을 복구
   git stash pop
+fi
