@@ -19,6 +19,12 @@ jobs:
         service_account_key: ${{ secrets.GCP_SA_KEY }}
         project_id: programmers-410523
 
+    - name: Copy script.sh to GCP Instance
+      run: |
+        git fetch origin main
+        git checkout origin/main -- script.sh
+        gcloud compute scp ./script.sh kylj0107@project-machine:~/dev-course-project-03 --zone=us-west4-b
+
     - name: Access Compute Engine and Execute Command
       env:
         MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
