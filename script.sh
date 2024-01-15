@@ -12,11 +12,11 @@ flag=false
 
 # 만약 현재 브랜치가 'main'이 아니라면 git stash 실행
 if [ "$current_branch" != "main" ]; then
-    echo "Not on main branch. Executing git stash..."
-    git stash
-		echo "Switching to 'main' branch..."
-		git switch main
-		flag=true
+  echo "Not on main branch. Executing git stash..."
+  git stash
+  echo "Switching to 'main' branch..."
+  git switch main
+  flag=true
 else
     echo "On main branch. No action needed."
 fi
@@ -38,10 +38,10 @@ git pull || { echo "Failed to pull changes from Git. Exiting."; exit 1; }
 
 # flag가 true일 경우 원래 브랜치로 돌아감
 if [ "$flag" = true ]; then
-    echo "Switching back to the original branch: $current_branch"
+  echo "Switching back to the original branch: $current_branch"
 
-	# 원래 브랜치로 이동
-    git checkout $current_branch
+  # 원래 브랜치로 이동
+  git switch $current_branch
 
-    # stash에 저장된 변경사항을 복구
-    git stash pop
+  # stash에 저장된 변경사항을 복구
+  git stash pop
